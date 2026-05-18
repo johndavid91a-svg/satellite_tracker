@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Mission control dark theme */
+    --background: 220 30% 5%;
+    --foreground: 180 15% 92%;
+
+    --card: 220 30% 8%;
+    --card-foreground: 180 15% 92%;
+
+    --popover: 220 35% 6%;
+    --popover-foreground: 180 15% 92%;
+
+    --primary: 180 100% 55%;
+    --primary-foreground: 220 40% 5%;
+
+    --secondary: 220 25% 14%;
+    --secondary-foreground: 180 15% 92%;
+
+    --muted: 220 20% 12%;
+    --muted-foreground: 200 10% 60%;
+
+    --accent: 145 95% 55%;
+    --accent-foreground: 220 40% 5%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --warning: 38 100% 60%;
+    --info: 210 100% 65%;
+    --pakistan: 145 80% 45%;
+
+    --border: 200 30% 18%;
+    --input: 220 25% 14%;
+    --ring: 180 100% 55%;
+
+    --radius: 0.5rem;
+
+    /* Gradients */
+    --gradient-panel: linear-gradient(180deg, hsl(220 35% 8% / 0.95), hsl(220 40% 5% / 0.95));
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(180 100% 55% / 0.25), transparent 70%);
+    --gradient-accent: linear-gradient(135deg, hsl(180 100% 55%), hsl(145 95% 55%));
+
+    /* Shadows / glows */
+    --glow-primary: 0 0 20px hsl(180 100% 55% / 0.5), 0 0 40px hsl(180 100% 55% / 0.2);
+    --glow-accent: 0 0 16px hsl(145 95% 55% / 0.55);
+    --shadow-panel: 0 8px 32px hsl(220 60% 2% / 0.6);
+  }
+
+  .dark {
+    --background: 220 30% 5%;
+    --foreground: 180 15% 92%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html, body, #root { height: 100%; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    background-image:
+      radial-gradient(circle at 20% 10%, hsl(180 100% 50% / 0.06), transparent 40%),
+      radial-gradient(circle at 80% 90%, hsl(145 95% 55% / 0.05), transparent 40%);
+  }
+}
+
+@layer components {
+  .panel {
+    background: var(--gradient-panel);
+    @apply border border-border backdrop-blur-md rounded-lg;
+    box-shadow: var(--shadow-panel);
+  }
+  .glow-text { text-shadow: 0 0 8px hsl(var(--primary) / 0.7); }
+  .scanline::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent 0, transparent 2px,
+      hsl(180 100% 55% / 0.03) 2px, hsl(180 100% 55% / 0.03) 3px);
+    pointer-events: none;
+  }
+}
+
+/* ── Leaflet base ───────────────────────────────────────────── */
+.leaflet-container {
+  background: #0a0f1a !important;
+  font-family: inherit;
+}
+
+/* zoom controls */
+.leaflet-control-zoom { border: none !important; }
+.leaflet-control-zoom a {
+  background: hsl(220 30% 10% / 0.92) !important;
+  color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--border)) !important;
+  transition: background 0.18s, color 0.18s !important;
+  backdrop-filter: blur(8px);
+  font-size: 16px !important;
+  line-height: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+.leaflet-control-zoom a:hover {
+  background: hsl(220 30% 18% / 0.95) !important;
+  color: hsl(var(--accent)) !important;
+}
+
+/* attribution */
+.leaflet-control-attribution {
+  background: hsl(220 30% 8% / 0.8) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 9px !important;
+}
+.leaflet-control-attribution a { color: hsl(var(--primary)) !important; }
+
+/* ── Popup ──────────────────────────────────────────────────── */
+.pk-popup .leaflet-popup-content-wrapper {
+  background: hsl(220 35% 7% / 0.97) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(180 100% 55% / 0.35) !important;
+  box-shadow: 0 0 24px hsl(180 100% 55% / 0.18), 0 8px 32px #00000088 !important;
+  backdrop-filter: blur(16px);
+  border-radius: 10px !important;
+  animation: pk-popup-in 0.2s cubic-bezier(0.34,1.4,0.64,1) both;
+}
+.pk-popup .leaflet-popup-tip-container { display: none; }
+.pk-popup .leaflet-popup-content { margin: 14px 16px !important; }
+
+@keyframes pk-popup-in {
+  from { opacity:0; transform: translateY(10px) scale(0.93); }
+  to   { opacity:1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Satellite pulse ring ───────────────────────────────────── */
+.pk-pulse {
+  display: block;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--c, #00ffcc);
+  box-shadow: 0 0 10px var(--c, #00ffcc);
+  animation: pk-pulse-anim 1.6s ease-out infinite;
+}
+@keyframes pk-pulse-anim {
+  0%   { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* ── Marker hover ───────────────────────────────────────────── */
+.leaflet-interactive { cursor: pointer; }
+.leaflet-interactive:hover { filter: drop-shadow(0 0 5px currentColor); }
+
+/* ── Per-sat tilt-coverage label (T° · standoff km) ─────────── */
+.leaflet-tooltip.pk-tilt-tip {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.leaflet-tooltip.pk-tilt-tip::before { display: none !important; }
+
+/* ── Blink ──────────────────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.blink { animation: blink 1.4s ease-in-out infinite; }

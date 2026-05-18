@@ -1,0 +1,29 @@
+{
+  "snapshot_date_utc": "2026-05-13",
+  "created_at": "2026-05-13T11:22:32Z",
+  "files": [
+    {
+      "name": "satellite_history.json",
+      "size_bytes": 334763
+    },
+    {
+      "name": "anomalies.json",
+      "size_bytes": 18069
+    },
+    {
+      "name": "forecast_15day.json",
+      "size_bytes": 3661852
+    },
+    {
+      "name": "tle_cache_celestrak.json",
+      "size_bytes": 9459
+    }
+  ],
+  "dirs": [
+    {
+      "name": "documents",
+      "file_count": 65
+    }
+  ],
+  "skipped": []
+}

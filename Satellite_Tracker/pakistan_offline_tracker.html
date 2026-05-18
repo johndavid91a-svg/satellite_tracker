@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakistan Offline Satellite Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(20,5,40,0.95), rgba(10,3,25,0.95));
+            border-bottom: 2px solid rgba(239,68,68,0.3);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            position: relative;
+            height: 70px;
+        }
+
+        .title {
+            color: #ef4444;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ef4444, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .filter-btn.active {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            color: #a855f7;
+            font-size: 11px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #2d1b69 100%);
+            overflow: hidden;
+        }
+
+        .pakistan-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #2d1b69 100%);
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        .pakistan-border {
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 60%;
+            height: 70%;
+            border: 2px solid #ef4444;
+            border-radius: 20px 40px 30px 15px;
+            opacity: 0.8;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .city {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ffff00;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffff00;
+        }
+
+        .city-label {
+            position: absolute;
+            color: #ffff00;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000000;
+            white-space: nowrap;
+        }
+
+        .satellite {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 15px currentColor;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .satellite:hover {
+            transform: scale(1.5);
+            z-index: 200;
+        }
+
+        .satellite.india {
+            background: #ef4444;
+            color: #ef4444;
+        }
+
+        .satellite.usa {
+            background: #a855f7;
+            color: #a855f7;
+        }
+
+        .satellite.israel {
+            background: #eab308;
+            color: #eab308;
+        }
+
+        .satellite.other {
+            background: #ffffff;
+            color: #ffffff;
+        }
+
+        .satellite-trail {
+            position: absolute;
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, currentColor, transparent);
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .satellite-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ef4444;
+            min-width: 250px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .satellite-info h3 {
+            color: #ef4444;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .satellite-info p {
+            margin: 3px 0;
+            font-size: 11px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #22c55e;
+            z-index: 1000;
+            font-size: 11px;
+        }
+
+        .status-live {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .country-labels {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.6;
+            text-shadow: 1px 1px 2px #000000;
+        }
+
+        .label-afghanistan {
+            top: 25%;
+            left: 15%;
+            color: #fb923c;
+        }
+
+        .label-india {
+            top: 35%;
+            right: 15%;
+            color: #fb923c;
+        }
+
+        .label-iran {
+            bottom: 40%;
+            left: 10%;
+            color: #fb923c;
+        }
+
+        .label-china {
+            top: 15%;
+            left: 45%;
+            color: #fb923c;
+        }
+
+        @keyframes satellitePulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 15px currentColor;
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 25px currentColor, 0 0 35px currentColor;
+            }
+        }
+
+        .satellite {
+            animation: satellitePulse 3s infinite;
+        }
+
+        @keyframes satelliteMove {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(20px) translateY(-10px); }
+            50% { transform: translateX(40px) translateY(5px); }
+            75% { transform: translateX(20px) translateY(15px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🛰️ Pakistan Offline Satellite Tracker</div>
+        <div class="controls">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="imagery">Imagery</button>
+            <button class="filter-btn" data-filter="reconnaissance">Recon</button>
+            <button class="filter-btn" data-filter="communication">Comm</button>
+            <button class="filter-btn" data-filter="navigation">Nav</button>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSats">12</div>
+                <div>Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="indiaSats">4</div>
+                <div>India</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="usaSats">5</div>
+                <div>USA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="israelSats">2</div>
+                <div>Israel</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="otherSats">1</div>
+                <div>Others</div>
+            </div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444;"></div>
+                <span>India</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a855f7;"></div>
+                <span>USA</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #eab308;"></div>
+                <span>Israel</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffffff;"></div>
+                <span>Others</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div class="pakistan-map"></div>
+        <div class="grid-overlay"></div>
+        
+        <!-- Pakistan Border -->
+        <div class="pakistan-border"></div>
+        
+        <!-- Country Labels -->
+        <div class="country-labels label-afghanistan">AFGHANISTAN</div>
+        <div class="country-labels label-india">INDIA</div>
+        <div class="country-labels label-iran">IRAN</div>
+        <div class="country-labels label-china">CHINA</div>
+        
+        <!-- Major Cities -->
+        <div class="city" style="top: 30%; left: 45%;" data-city="Islamabad"></div>
+        <div class="city-label" style="top: 28%; left: 47%;">Islamabad</div>
+        
+        <div class="city" style="bottom: 25%; left: 25%;" data-city="Karachi"></div>
+        <div class="city-label" style="bottom: 23%; left: 27%;">Karachi</div>
+        
+        <div class="city" style="top: 45%; left: 55%;" data-city="Lahore"></div>
+        <div class="city-label" style="top: 43%; left: 57%;">Lahore</div>
+        
+        <div class="city" style="top: 25%; left: 35%;" data-city="Peshawar"></div>
+        <div class="city-label" style="top: 23%; left: 37%;">Peshawar</div>
+        
+        <div class="city" style="bottom: 45%; left: 20%;" data-city="Quetta"></div>
+        <div class="city-label" style="bottom: 43%; left: 22%;">Quetta</div>
+
+        <!-- Satellites will be added here by JavaScript -->
+        
+        <div class="satellite-info" id="satelliteInfo">
+            <h3 id="satName">Satellite Name</h3>
+            <p><strong>Country:</strong> <span id="satCountry">Unknown</span></p>
+            <p><strong>Type:</strong> <span id="satType">Unknown</span></p>
+            <p><strong>Altitude:</strong> <span id="satAltitude">0 km</span></p>
+            <p><strong>Speed:</strong> <span id="satSpeed">0 km/h</span></p>
+            <p><strong>NORAD ID:</strong> <span id="satNorad">0</span></p>
+            <p><strong>Status:</strong> <span id="satStatus">Active</span></p>
+        </div>
+        
+        <div class="status-indicator">
+            <span class="status-live">● LIVE</span> - Offline tracking mode
+        </div>
+    </div>
+
+    <script>
+        // Satellite database
+        const satellites = [
+            // India satellites
+            { id: 1, name: 'CARTOSAT-2E', country: 'India', type: 'Imagery', norad: 41948, altitude: 505, speed: 27500 },
+            { id: 2, name: 'RESOURCESAT-2A', country: 'India', type: 'Earth Observation', norad: 42037, altitude: 817, speed: 26800 },
+            { id: 3, name: 'RISAT-2B', country: 'India', type: 'Radar Imaging', norad: 44227, altitude: 555, speed: 27200 },
+            { id: 4, name: 'GSAT-30', country: 'India', type: 'Communication', norad: 45269, altitude: 35786, speed: 11070 },
+            
+            // USA satellites
+            { id: 5, name: 'LANDSAT-8', country: 'USA', type: 'Earth Observation', norad: 39084, altitude: 705, speed: 26800 },
+            { id: 6, name: 'WORLDVIEW-3', country: 'USA', type: 'Imagery', norad: 40115, altitude: 617, speed: 27100 },
+            { id: 7, name: 'KEYHOLE-12', country: 'USA', type: 'Reconnaissance', norad: 25744, altitude: 270, speed: 28100 },
+            { id: 8, name: 'GPS BIIR-2', country: 'USA', type: 'Navigation', norad: 26360, altitude: 20200, speed: 14000 },
+            { id: 9, name: 'SBIRS GEO-4', country: 'USA', type: 'Reconnaissance', norad: 43651, altitude: 35786, speed: 11070 },
+            
+            // Israel satellites
+            { id: 10, name: 'OFEK-16', country: 'Israel', type: 'Reconnaissance', norad: 46123, altitude: 600, speed: 27200 },
+            { id: 11, name: 'EROS-B', country: 'Israel', type: 'Imagery', norad: 31601, altitude: 510, speed: 27400 },
+            
+            // Others
+            { id: 12, name: 'SPOT-7', country: 'France', type: 'Imagery', norad: 40053, altitude: 694, speed: 26900 }
+        ];
+
+        let currentFilter = 'all';
+        let satelliteElements = {};
+
+        // Initialize satellites
+        function initSatellites() {
+            const container = document.querySelector('.map-container');
+            
+            satellites.forEach(sat => {
+                // Create satellite element
+                const satElement = document.createElement('div');
+                satElement.className = `satellite ${sat.country.toLowerCase()}`;
+                satElement.id = `sat-${sat.id}`;
+                
+                // Random initial position within Pakistan area
+                const top = 20 + Math.random() * 60; // 20% to 80% from top
+                const left = 25 + Math.random() * 50; // 25% to 75% from left
+                
+                satElement.style.top = `${top}%`;
+                satElement.style.left = `${left}%`;
+                
+                // Add click event
+                satElement.addEventListener('click', () => showSatelliteInfo(sat));
+                
+                container.appendChild(satElement);
+                satelliteElements[sat.id] = {
+                    element: satElement,
+                    x: left,
+                    y: top,
+                    vx: (Math.random() - 0.5) * 0.5, // velocity x
+                    vy: (Math.random() - 0.5) * 0.5, // velocity y
+                    data: sat
+                };
+            });
+        }
+
+        // Show satellite information
+        function showSatelliteInfo(satellite) {
+            document.getElementById('satName').textContent = satellite.name;
+            document.getElementById('satCountry').textContent = satellite.country;
+            document.getElementById('satType').textContent = satellite.type;
+            document.getElementById('satAltitude').textContent = `${satellite.altitude} km`;
+            document.getElementById('satSpeed').textContent = `${satellite.speed} km/h`;
+            document.getElementById('satNorad').textContent = satellite.norad;
+            document.getElementById('satStatus').textContent = 'Active';
+            
+            document.getElementById('satelliteInfo').style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                document.getElementById('satelliteInfo').style.display = 'none';
+            }, 5000);
+        }
+
+        // Update satellite positions
+        function updateSatellitePositions() {
+            Object.values(satelliteElements).forEach(sat => {
+                // Update position
+                sat.x += sat.vx;
+                sat.y += sat.vy;
+                
+                // Bounce off boundaries (Pakistan area)
+                if (sat.x <= 20 || sat.x >= 75) {
+                    sat.vx = -sat.vx;
+                    sat.x = Math.max(20, Math.min(75, sat.x));
+                }
+                if (sat.y <= 15 || sat.y >= 85) {
+                    sat.vy = -sat.vy;
+                    sat.y = Math.max(15, Math.min(85, sat.y));
+                }
+                
+                // Apply position
+                sat.element.style.left = `${sat.x}%`;
+                sat.element.style.top = `${sat.y}%`;
+            });
+        }
+
+        // Filter satellites
+        function filterSatellites(filterType) {
+            currentFilter = filterType;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filterType) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide satellites based on filter
+            Object.values(satelliteElements).forEach(sat => {
+                const shouldShow = filterType === 'all' || 
+                    sat.data.type.toLowerCase().includes(filterType.toLowerCase());
+                
+                sat.element.style.display = shouldShow ? 'block' : 'none';
+            });
+            
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const visibleSats = Object.values(satelliteElements).filter(sat => 
+                sat.element.style.display !== 'none'
+            );
+            
+            const stats = {
+                total: visibleSats.length,
+                india: visibleSats.filter(sat => sat.data.country === 'India').length,
+                usa: visibleSats.filter(sat => sat.data.country === 'USA').length,
+                israel: visibleSats.filter(sat => sat.data.country === 'Israel').length,
+                others: visibleSats.filter(sat => !['India', 'USA', 'Israel'].includes(sat.data.country)).length
+            };
+
+            document.getElementById('totalSats').textContent = stats.total;
+            document.getElementById('indiaSats').textContent = stats.india;
+            document.getElementById('usaSats').textContent = stats.usa;
+            document.getElementById('israelSats').textContent = stats.israel;
+            document.getElementById('otherSats').textContent = stats.others;
+        }
+
+        // Initialize filter buttons
+        function initFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterSatellites(btn.dataset.filter);
+                });
+            });
+        }
+
+        // Start real-time updates
+        function startUpdates() {
+            setInterval(() => {
+                updateSatellitePositions();
+            }, 100); // Update every 100ms for smooth movement
+        }
+
+        // Initialize application
+        function init() {
+            initSatellites();
+            initFilters();
+            updateStats();
+            startUpdates();
+            
+            console.log('Pakistan Offline Satellite Tracker initialized');
+            console.log(`Tracking ${satellites.length} satellites`);
+        }
+
+        // Start when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

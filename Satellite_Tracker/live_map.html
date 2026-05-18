@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>ATLAS — Live Satellite Tracker</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#06030f; color:#ede9fe; font-family:'Segoe UI',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+/* ── Top bar ── */
+#topbar {
+  background:#0a0518; border-bottom:1px solid #2d1a4a;
+  padding:0 16px; height:44px; display:flex; align-items:center; gap:12px;
+  flex-shrink:0; z-index:1000;
+}
+.tb-logo { color:#c084fc; font-size:13px; font-weight:700; letter-spacing:2px; }
+.tb-sep  { color:#2d1a4a; }
+#tb-count { font-size:11px; color:#7c6fa0; }
+#tb-pak   { font-size:11px; color:#f472b6; font-weight:700; }
+#tb-clock { font-family:monospace; font-size:13px; color:#a78bfa; margin-left:auto; }
+#tb-status { font-size:10px; padding:2px 8px; border-radius:10px; background:#0f0a20; border:1px solid #2d1a4a; color:#7c6fa0; }
+#tb-status.live { border-color:#22c55e40; color:#22c55e; background:#052e1640; }
+
+/* ── Layout ── */
+#layout { display:flex; flex:1; overflow:hidden; }
+
+/* ── Map ── */
+#map { flex:1; background:#06030f; }
+
+/* ── Right panel ── */
+#panel {
+  width:320px; background:#0a0518; border-left:1px solid #2d1a4a;
+  display:flex; flex-direction:column; overflow:hidden; flex-shrink:0;
+}
+
+/* Panel header */
+.ph {
+  padding:10px 14px; background:#0d0820; border-bottom:1px solid #2d1a4a;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.ph-title { font-size:11px; font-weight:700; color:#c084fc; letter-spacing:1px; }
+.ph-btn {
+  background:#1a0f35; border:1px solid #2d1a4a; color:#a78bfa;
+  padding:3px 10px; border-radius:4px; cursor:pointer; font-size:10px;
+}
+.ph-btn:hover { background:#2d1a4a; color:#c084fc; }
+
+/* Filters */
+#filters { padding:8px 10px; border-bottom:1px solid #2d1a4a; display:flex; flex-wrap:wrap; gap:4px; }
+.fb {
+  padding:2px 9px; border-radius:10px; border:1px solid #2d1a4a;
+  font-size:10px; cursor:pointer; background:#0d0820; color:#7c6fa0; transition:all .15s;
+}
+.fb.on { background:#2d1a4a; color:#c084fc; border-color:#c084fc; }
+.fb.pak-btn.on { background:#f472b620; color:#f472b6; border-color:#f472b6; }
+
+/* Satellite list */
+#sat-list { flex:1; overflow-y:auto; }
+#sat-list::-webkit-scrollbar { width:3px; }
+#sat-list::-webkit-scrollbar-thumb { background:#2d1a4a; }
+
+.si {
+  padding:9px 12px; border-bottom:1px solid #0f0a20;
+  cursor:pointer; transition:background .1s; position:relative;
+}
+.si:hover { background:#0f0a20; }
+.si.sel   { background:#150d30; border-left:2px solid #c084fc; }
+.si.pak   { border-left:2px solid #f472b6 !important; }
+.si-name  { font-size:12px; font-weight:600; color:#ede9fe; display:flex; align-items:center; gap:5px; }
+.si-sub   { font-size:10px; color:#7c6fa0; margin-top:2px; }
+.si-pos   { font-size:10px; color:#a78bfa; font-family:monospace; margin-top:2px; }
+.si-spd   { font-size:10px; color:#60a5fa; margin-top:1px; }
+.dot      { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.badge    { font-size:9px; padding:1px 5px; border-radius:8px; font-weight:700; }
+.b-pak    { background:#f472b620; color:#f472b6; border:1px solid #f472b640; }
+.b-type   { background:#c084fc15; color:#c084fc; border:1px solid #c084fc30; }
+
+/* Detail card */
+#detail {
+  border-top:1px solid #2d1a4a; background:#0d0820;
+  max-height:320px; overflow-y:auto; display:none;
+}
+#detail.show { display:block; }
+.dc-head {
+  padding:10px 14px 6px; display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid #0f0a20;
+}
+.dc-name  { font-size:13px; font-weight:700; color:#c084fc; }
+.dc-close { margin-left:auto; cursor:pointer; color:#7c6fa0; font-size:16px; line-height:1; }
+.dc-close:hover { color:#f472b6; }
+.dc-body  { padding:8px 14px; }
+.dr { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #0f0a2060; font-size:11px; }
+.dl { color:#7c6fa0; }
+.dv { color:#ede9fe; font-family:monospace; text-align:right; }
+.dv.hi { color:#f472b6; font-weight:700; }
+.dv.spd { color:#60a5fa; }
+
+/* Status bar */
+#sbar {
+  background:#0a0518; border-top:1px solid #2d1a4a;
+  padding:3px 16px; font-size:10px; color:#7c6fa0;
+  display:flex; gap:16px; flex-shrink:0;
+}
+#sbar span { color:#a78bfa; }
+
+/* ── Satellite SVG icon ── */
+.sat-svg-icon { cursor:pointer; }
+
+/* Leaflet popup */
+.leaflet-popup-content-wrapper {
+  background:#0d0820 !important; border:1px solid #2d1a4a !important;
+  color:#ede9fe !important; border-radius:8px !important; box-shadow:0 4px 20px #00000080 !important;
+}
+.leaflet-popup-tip { background:#0d0820 !important; }
+.leaflet-popup-content { font-size:11px; line-height:1.7; min-width:200px; }
+.pu-title { font-size:13px; font-weight:700; color:#c084fc; margin-bottom:6px; }
+.pu-row   { display:flex; gap:8px; }
+.pu-l     { color:#7c6fa0; min-width:75px; }
+.pu-v     { color:#ede9fe; font-family:monospace; }
+.pu-pak   { color:#f472b6; font-weight:700; margin-top:6px; font-size:12px; }
+.pu-spd   { color:#60a5fa; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <span class="tb-logo">🛰 ATLAS LIVE TRACKER</span>
+  <span class="tb-sep">|</span>
+  <span id="tb-count">Connecting...</span>
+  <span id="tb-pak"></span>
+  <span id="tb-status">CONNECTING</span>
+  <span id="tb-clock">--:--:-- UTC</span>
+</div>
+
+<div id="layout">
+  <div id="map"></div>
+
+  <div id="panel">
+    <div class="ph">
+      <span class="ph-title">SATELLITES</span>
+      <button class="ph-btn" onclick="refreshTLEs()">⟳ REFRESH TLEs</button>
+    </div>
+
+    <div id="filters">
+      <button class="fb on"  onclick="setFilter('all',this)">All</button>
+      <button class="fb"     onclick="setFilter('Earth Observation',this)">EO</button>
+      <button class="fb"     onclick="setFilter('Radar/SAR',this)">SAR</button>
+      <button class="fb"     onclick="setFilter('Reconnaissance',this)">Recon</button>
+      <button class="fb"     onclick="setFilter('Weather',this)">Weather</button>
+      <button class="fb"     onclick="setFilter('Space Station',this)">Station</button>
+      <button class="fb pak-btn" onclick="setFilter('over_pak',this)">🇵🇰 Over PAK</button>
+    </div>
+
+    <div id="sat-list"></div>
+
+    <div id="detail">
+      <div class="dc-head">
+        <span id="dc-flag"></span>
+        <span class="dc-name" id="dc-name">—</span>
+        <span class="dc-close" onclick="closeDetail()">✕</span>
+      </div>
+      <div class="dc-body" id="dc-body"></div>
+    </div>
+  </div>
+</div>
+
+<div id="sbar">
+  Updated: <span id="sb-time">—</span>
+  &nbsp;|&nbsp; Refresh: <span id="sb-cd">2s</span>
+  &nbsp;|&nbsp; Source: <span>SatNOGS + SGP4</span>
+  &nbsp;|&nbsp; PAK Zone: <span>23.5–37.5°N · 60.5–77.5°E</span>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const API = "http://127.0.0.1:5123";
+
+// ── Colours ────────────────────────────────────────────────────────────────
+const COLORS = {
+  "Earth Observation": "#c084fc",
+  "Radar/SAR":         "#f472b6",
+  "Reconnaissance":    "#fb7185",
+  "Weather":           "#60a5fa",
+  "Space Station":     "#34d399",
+};
+const FLAGS = { USA:"🇺🇸", China:"🇨🇳", India:"🇮🇳", Europe:"🇪🇺", France:"🇫🇷", International:"🌐" };
+const DEFAULT_COLOR = "#a78bfa";
+
+// ── Map ────────────────────────────────────────────────────────────────────
+const map = L.map('map', { center:[25, 65], zoom:4, zoomControl:true, preferCanvas:true });
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO', maxZoom:18,
+}).addTo(map);
+
+// Pakistan zone
+L.rectangle([[23.5,60.5],[37.5,77.5]], {
+  color:'#f472b6', weight:1.5, fill:true,
+  fillColor:'#f472b6', fillOpacity:0.06, dashArray:'6 4',
+}).addTo(map).bindTooltip('Pakistan Surveillance Zone');
+
+// ── State ──────────────────────────────────────────────────────────────────
+let allSats      = [];
+let markers      = {};   // norad_id → L.marker
+let orbitLines   = {};   // norad_id → L.polyline[]
+let trails       = {};   // norad_id → [[lat,lon], ...]
+let trailLines   = {};   // norad_id → L.polyline
+let prevPos      = {};   // norad_id → {lat,lon}
+let animFrames   = {};   // norad_id → requestAnimationFrame id
+let activeFilter = 'all';
+let selectedId   = null;
+let countdown    = 2;
+
+// ── Satellite icon (arrow shape, rotates with heading) ─────────────────────
+function makeSatIcon(color, heading, overPak, size) {
+  size = size || (overPak ? 22 : 16);
+  const glow = overPak
+    ? `filter:drop-shadow(0 0 6px ${color}) drop-shadow(0 0 3px #f472b6);`
+    : `filter:drop-shadow(0 0 3px ${color}60);`;
+  // Arrow pointing up, rotated by heading
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:${size}px;height:${size}px;transform:rotate(${heading}deg);${glow}">
+      <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+        <polygon points="12,2 20,20 12,15 4,20" fill="${color}" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+      </svg>
+    </div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+  });
+}
+
+// ── Smooth interpolation between two positions ─────────────────────────────
+function interpolate(from, to, t) {
+  // t = 0..1
+  return {
+    lat: from.lat + (to.lat - from.lat) * t,
+    lon: from.lon + (to.lon - from.lon) * t,
+  };
+}
+
+function animateMarker(noradId, fromPos, toPos, heading, color, overPak, durationMs) {
+  if (animFrames[noradId]) cancelAnimationFrame(animFrames[noradId]);
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min(1, (now - start) / durationMs);
+    const pos = interpolate(fromPos, toPos, t);
+    if (markers[noradId]) {
+      markers[noradId].setLatLng([pos.lat, pos.lon]);
+      markers[noradId].setIcon(makeSatIcon(color, heading, overPak));
+    }
+    if (t < 1) animFrames[noradId] = requestAnimationFrame(step);
+  }
+  animFrames[noradId] = requestAnimationFrame(step);
+}
+
+// ── Orbit track (handles antimeridian splits) ──────────────────────────────
+function drawOrbit(noradId, orbitPoints, color, visible) {
+  // Remove old
+  if (orbitLines[noradId]) {
+    orbitLines[noradId].forEach(l => map.removeLayer(l));
+  }
+  orbitLines[noradId] = [];
+  if (!visible || !orbitPoints || orbitPoints.length < 2) return;
+
+  // Split at null (antimeridian breaks)
+  let segment = [];
+  orbitPoints.forEach(pt => {
+    if (pt === null) {
+      if (segment.length > 1) {
+        orbitLines[noradId].push(
+          L.polyline(segment, { color, weight:1, opacity:0.25, dashArray:'4 8' }).addTo(map)
+        );
+      }
+      segment = [];
+    } else {
+      segment.push(pt);
+    }
+  });
+  if (segment.length > 1) {
+    orbitLines[noradId].push(
+      L.polyline(segment, { color, weight:1, opacity:0.25, dashArray:'4 8' }).addTo(map)
+    );
+  }
+}
+
+// ── Trail (last N positions) ───────────────────────────────────────────────
+const TRAIL_LEN = 12;
+function updateTrail(noradId, lat, lon, color) {
+  if (!trails[noradId]) trails[noradId] = [];
+  trails[noradId].push([lat, lon]);
+  if (trails[noradId].length > TRAIL_LEN) trails[noradId].shift();
+  if (trailLines[noradId]) map.removeLayer(trailLines[noradId]);
+  if (trails[noradId].length > 1) {
+    trailLines[noradId] = L.polyline(trails[noradId], {
+      color, weight:2, opacity:0.5,
+    }).addTo(map);
+  }
+}
+
+// ── Popup content ──────────────────────────────────────────────────────────
+function popupHtml(sat) {
+  const flag = FLAGS[sat.country] || '🛰';
+  return `
+    <div class="pu-title">${flag} ${sat.name}</div>
+    <div class="pu-row"><span class="pu-l">NORAD ID</span><span class="pu-v">${sat.norad_id}</span></div>
+    <div class="pu-row"><span class="pu-l">Owner</span><span class="pu-v">${sat.owner}</span></div>
+    <div class="pu-row"><span class="pu-l">Type</span><span class="pu-v">${sat.type}</span></div>
+    <div class="pu-row"><span class="pu-l">Altitude</span><span class="pu-v">${sat.alt} km</span></div>
+    <div class="pu-row"><span class="pu-l">Position</span><span class="pu-v">${sat.lat}°N ${sat.lon}°E</span></div>
+    <div class="pu-row"><span class="pu-l">Heading</span><span class="pu-v">${sat.heading}°</span></div>
+    <div class="pu-row"><span class="pu-l">Speed</span><span class="pu-v pu-spd">${sat.speed_kmh.toLocaleString()} km/h</span></div>
+    <div class="pu-row"><span class="pu-l">Period</span><span class="pu-v">${sat.period_min} min</span></div>
+    ${sat.over_pak ? '<div class="pu-pak">⚠ CURRENTLY OVER PAKISTAN</div>' : ''}
+  `;
+}
+
+// ── Main render ────────────────────────────────────────────────────────────
+function renderSatellites(sats) {
+  const showOrbit = selectedId !== null;
+
+  sats.forEach(sat => {
+    const color   = COLORS[sat.type] || DEFAULT_COLOR;
+    const fromPos = prevPos[sat.norad_id] || { lat: sat.lat, lon: sat.lon };
+    const toPos   = { lat: sat.lat2 || sat.lat, lon: sat.lon2 || sat.lon };
+
+    // Create marker if new
+    if (!markers[sat.norad_id]) {
+      const icon = makeSatIcon(color, sat.heading, sat.over_pak);
+      markers[sat.norad_id] = L.marker([sat.lat, sat.lon], { icon, zIndexOffset: sat.over_pak ? 1000 : 0 })
+        .addTo(map)
+        .on('click', () => selectSat(sat.norad_id));
+    }
+
+    // Animate to new position
+    animateMarker(sat.norad_id, fromPos, toPos, sat.heading, color, sat.over_pak, 1800);
+    prevPos[sat.norad_id] = { lat: sat.lat, lon: sat.lon };
+
+    // Trail
+    updateTrail(sat.norad_id, sat.lat, sat.lon, color);
+
+    // Orbit — only for selected satellite
+    const showThisOrbit = (sat.norad_id === selectedId);
+    drawOrbit(sat.norad_id, sat.orbit, color, showThisOrbit);
+
+    // Update popup if open
+    if (markers[sat.norad_id].isPopupOpen()) {
+      markers[sat.norad_id].setPopupContent(popupHtml(sat));
+    } else {
+      markers[sat.norad_id].bindPopup(popupHtml(sat), { maxWidth:280 });
+    }
+  });
+
+  // Remove satellites no longer in data
+  const ids = new Set(sats.map(s => s.norad_id));
+  Object.keys(markers).forEach(id => {
+    if (!ids.has(id)) {
+      map.removeLayer(markers[id]); delete markers[id];
+      if (orbitLines[id]) { orbitLines[id].forEach(l => map.removeLayer(l)); delete orbitLines[id]; }
+      if (trailLines[id]) { map.removeLayer(trailLines[id]); delete trailLines[id]; }
+    }
+  });
+}
+
+// ── Sidebar list ───────────────────────────────────────────────────────────
+function renderList(sats) {
+  const filtered = filterSats(sats);
+  filtered.sort((a,b) => (b.over_pak - a.over_pak) || a.name.localeCompare(b.name));
+
+  document.getElementById('sat-list').innerHTML = filtered.map(sat => {
+    const color = COLORS[sat.type] || DEFAULT_COLOR;
+    const flag  = FLAGS[sat.country] || '🛰';
+    const sel   = sat.norad_id === selectedId ? 'sel' : '';
+    const pak   = sat.over_pak ? 'pak' : '';
+    const pakBadge = sat.over_pak ? '<span class="badge b-pak">OVER PAK</span>' : '';
+    return `<div class="si ${sel} ${pak}" onclick="selectSat('${sat.norad_id}')">
+      <div class="si-name">
+        <span class="dot" style="background:${color}"></span>
+        ${flag} ${sat.name} ${pakBadge}
+      </div>
+      <div class="si-sub">${sat.owner} · <span class="badge b-type">${sat.type}</span></div>
+      <div class="si-pos">${sat.lat}°N  ${sat.lon}°E  ↑${sat.alt}km</div>
+      <div class="si-spd">⬆ ${sat.heading}°  ⚡ ${sat.speed_kmh.toLocaleString()} km/h</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Detail panel ───────────────────────────────────────────────────────────
+function showDetail(sat) {
+  const flag = FLAGS[sat.country] || '🛰';
+  document.getElementById('dc-flag').textContent = flag;
+  document.getElementById('dc-name').textContent = sat.name;
+  const rows = [
+    ['NORAD ID',    sat.norad_id,                          ''],
+    ['Owner',       sat.owner,                             ''],
+    ['Country',     sat.country,                           ''],
+    ['Type',        sat.type,                              ''],
+    ['Latitude',    sat.lat + '°',                         ''],
+    ['Longitude',   sat.lon + '°',                         ''],
+    ['Altitude',    sat.alt + ' km',                       ''],
+    ['Heading',     sat.heading + '°',                     ''],
+    ['Speed',       sat.speed_kmh.toLocaleString() + ' km/h', 'spd'],
+    ['Orbital Period', sat.period_min + ' min',            ''],
+    ['Over Pakistan', sat.over_pak ? '⚠ YES' : 'No',      sat.over_pak ? 'hi' : ''],
+  ];
+  document.getElementById('dc-body').innerHTML = rows.map(([l,v,cls]) =>
+    `<div class="dr"><span class="dl">${l}</span><span class="dv ${cls}">${v}</span></div>`
+  ).join('');
+  document.getElementById('detail').classList.add('show');
+}
+
+function updateDetailLive(sat) {
+  if (sat.norad_id !== selectedId) return;
+  // Update only the live-changing fields
+  const body = document.getElementById('dc-body');
+  if (!body) return;
+  const rows = body.querySelectorAll('.dr');
+  const liveFields = { 4: sat.lat+'°', 5: sat.lon+'°', 6: sat.alt+' km',
+                       7: sat.heading+'°', 8: sat.speed_kmh.toLocaleString()+' km/h',
+                       10: sat.over_pak ? '⚠ YES' : 'No' };
+  Object.entries(liveFields).forEach(([i, v]) => {
+    if (rows[i]) rows[i].querySelector('.dv').textContent = v;
+  });
+}
+
+function closeDetail() {
+  selectedId = null;
+  document.getElementById('detail').classList.remove('show');
+  // Hide all orbits
+  Object.keys(orbitLines).forEach(id => {
+    if (orbitLines[id]) orbitLines[id].forEach(l => map.removeLayer(l));
+    orbitLines[id] = [];
+  });
+  renderList(allSats);
+}
+
+function selectSat(noradId) {
+  selectedId = noradId;
+  const sat = allSats.find(s => s.norad_id === noradId);
+  if (!sat) return;
+  map.setView([sat.lat, sat.lon], Math.max(map.getZoom(), 5), { animate:true });
+  if (markers[noradId]) markers[noradId].openPopup();
+  showDetail(sat);
+  // Draw orbit for selected
+  const color = COLORS[sat.type] || DEFAULT_COLOR;
+  drawOrbit(noradId, sat.orbit, color, true);
+  renderList(allSats);
+}
+
+// ── Filter ─────────────────────────────────────────────────────────────────
+function filterSats(sats) {
+  if (activeFilter === 'all')      return sats;
+  if (activeFilter === 'over_pak') return sats.filter(s => s.over_pak);
+  return sats.filter(s => s.type === activeFilter);
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  // Show/hide markers based on filter
+  const filtered = new Set(filterSats(allSats).map(s => s.norad_id));
+  Object.entries(markers).forEach(([id, m]) => {
+    if (filtered.has(id)) { if (!map.hasLayer(m)) map.addLayer(m); }
+    else                  { if (map.hasLayer(m))  map.removeLayer(m); }
+  });
+  renderList(allSats);
+}
+
+// ── Fetch & update ─────────────────────────────────────────────────────────
+async function fetchPositions() {
+  try {
+    const res  = await fetch(`${API}/positions`);
+    const data = await res.json();
+    allSats = data.satellites || [];
+
+    renderSatellites(allSats);
+    renderList(allSats);
+
+    // Update selected detail live
+    if (selectedId) {
+      const sel = allSats.find(s => s.norad_id === selectedId);
+      if (sel) updateDetailLive(sel);
+    }
+
+    const pakSats = allSats.filter(s => s.over_pak);
+    document.getElementById('tb-count').textContent = `${allSats.length} satellites`;
+    document.getElementById('tb-pak').textContent   = pakSats.length > 0
+      ? `⚠ ${pakSats.length} OVER PAKISTAN` : '';
+    document.getElementById('sb-time').textContent  = data.timestamp;
+    document.getElementById('tb-status').textContent = 'LIVE';
+    document.getElementById('tb-status').className  = 'tb-status live';
+  } catch(e) {
+    document.getElementById('tb-status').textContent = 'OFFLINE';
+    document.getElementById('tb-status').className  = 'tb-status';
+    document.getElementById('tb-count').textContent = 'API offline — start sat_live_api.py';
+  }
+}
+
+async function refreshTLEs() {
+  document.querySelector('.ph-btn').textContent = '⟳ Refreshing...';
+  try { await fetch(`${API}/refresh`); } catch {}
+  setTimeout(() => {
+    document.querySelector('.ph-btn').textContent = '⟳ REFRESH TLEs';
+    fetchPositions();
+  }, 4000);
+}
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const n = new Date();
+  const pad = v => String(v).padStart(2,'0');
+  document.getElementById('tb-clock').textContent =
+    `${pad(n.getUTCHours())}:${pad(n.getUTCMinutes())}:${pad(n.getUTCSeconds())} UTC`;
+}
+
+// ── Countdown & auto-refresh ───────────────────────────────────────────────
+function tick() {
+  countdown--;
+  document.getElementById('sb-cd').textContent = countdown + 's';
+  if (countdown <= 0) {
+    countdown = 2;
+    fetchPositions();
+  }
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+fetchPositions();
+setInterval(updateClock, 1000);
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

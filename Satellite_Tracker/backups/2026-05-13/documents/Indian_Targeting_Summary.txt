@@ -1,0 +1,134 @@
+================================================================================
+  INDIAN-SATELLITE TARGETING SUMMARY — Pakistan strategic sites
+  Window: 2026-05-13  ->  2026-05-27
+  Generated: 2026-05-13T11:06:36Z
+  All times PKT (UTC+5)
+================================================================================
+
+Indian satellite passes in the 15-day forecast: 217
+
+--------------------------------------------------------------------------------
+  PRIORITY CITIES — passes by Indian satellites over 15 days
+--------------------------------------------------------------------------------
+  CITY                 PASSES   BREAKDOWN BY SAT
+  Islamabad                88   RISAT-2BR1=52, EOS-4=16, CARTOSAT-2D=5, CARTOSAT-3=4
+  Rawalpindi              176   RISAT-2BR1=104, EOS-4=32, CARTOSAT-2D=10, CARTOSAT-3=8
+  Karachi                 185   RISAT-2BR1=78, EOS-4=45, RISAT-2B=23, CARTOSAT-2E=9
+  Lahore                  178   RISAT-2BR1=108, EOS-4=32, RISAT-2B=8, CARTOSAT-3=8
+  Kamra (Attock)           85   RISAT-2BR1=51, EOS-4=16, CARTOSAT-3=4, CARTOSAT-2D=3
+  Quetta                   77   RISAT-2BR1=40, EOS-4=16, RISAT-2B=6, CARTOSAT-2E=4
+  Sargodha                 82   RISAT-2BR1=52, EOS-4=15, CARTOSAT-3=4, RISAT-2B=3
+
+--------------------------------------------------------------------------------
+  DAILY INDIAN-SAT TARGETING — first 3 future passes per day
+--------------------------------------------------------------------------------
+
+  2026-05-13  (16 Indian passes)
+    06:27 PKT  OVER  RISAT-2B        ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:35 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    07:47 PKT  TILT  RISAT-2BR1      ->  TIER-1: —
+    08:09 PKT  OVER  RISAT-2B        ->  TIER-1: Karachi, Quetta + secondary: Gwadar, Ormara, Pasni
+    09:24 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-14  (17 Indian passes)
+    06:24 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:25 PKT  OVER  RISAT-2B        ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gujranwala, Khushab
+    07:43 PKT  OVER  RISAT-2BR1      ->  TIER-1: Karachi
+    08:07 PKT  TILT  RISAT-2B        ->  TIER-1: Karachi + secondary: Gwadar, Ormara, Pasni
+    09:23 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-15  (16 Indian passes)
+    06:13 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:23 PKT  OVER  RISAT-2B        ->  TIER-1: Karachi, Lahore, Quetta, Sargodha + secondary: Bahawalpur, Chashma, Gujranwala, Khushab, Mangla
+    07:40 PKT  OVER  RISAT-2BR1      ->  TIER-1: Karachi, Lahore + secondary: Bahawalpur, Gujranwala, Gwadar, Multan, Ormara
+    08:05 PKT  TILT  RISAT-2B        ->  TIER-1: — + secondary: Gwadar, Pasni
+    09:21 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-16  (16 Indian passes)
+    06:00 PKT  TILT  RISAT-2BR1      ->  TIER-1: —
+    06:02 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Gilgit, Gujranwala, Khushab
+    06:21 PKT  OVER  RISAT-2B        ->  TIER-1: Karachi, Quetta + secondary: Bahawalpur, Gwadar, Multan, Ormara, Pasni
+    07:36 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gujranwala, Gwadar
+    07:37 PKT  TILT  EOS-4           ->  TIER-1: —
+
+  2026-05-17  (15 Indian passes)
+    05:51 PKT  TILT  EOS-4           ->  TIER-1: — + secondary: Skardu
+    05:57 PKT  TILT  RISAT-2BR1      ->  TIER-1: —
+    06:19 PKT  OVER  RISAT-2B        ->  TIER-1: Karachi, Quetta + secondary: Gwadar, Ormara, Pasni
+    07:26 PKT  TILT  EOS-4           ->  TIER-1: —
+    07:34 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-18  (16 Indian passes)
+    05:42 PKT  TILT  EOS-4           ->  TIER-1: —
+    05:53 PKT  TILT  RISAT-2BR1      ->  TIER-1: —
+    06:17 PKT  TILT  RISAT-2B        ->  TIER-1: Karachi + secondary: Gwadar, Ormara, Pasni
+    07:14 PKT  OVER  EOS-4           ->  TIER-1: — + secondary: Gwadar, Pasni
+    07:32 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-19  (14 Indian passes)
+    05:34 PKT  TILT  EOS-4           ->  TIER-1: —
+    05:49 PKT  OVER  RISAT-2BR1      ->  TIER-1: Karachi, Lahore + secondary: Bahawalpur, Gujranwala, Gwadar, Multan, Ormara
+    07:03 PKT  OVER  EOS-4           ->  TIER-1: Karachi, Quetta + secondary: Gwadar, Ormara, Pasni
+    07:30 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    09:12 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+
+  2026-05-20  (14 Indian passes)
+    05:46 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gujranwala, Gwadar
+    06:52 PKT  OVER  EOS-4           ->  TIER-1: Kamra (Attock), Karachi, Quetta + secondary: Chashma, Gwadar, Khushab, Ormara, Pasni
+    07:29 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    09:10 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:37 PKT  TILT  CARTOSAT-3      ->  TIER-1: —
+
+  2026-05-21  (14 Indian passes)
+    05:44 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:41 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    07:26 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:08 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:24 PKT  TILT  CARTOSAT-2D     ->  TIER-1: —
+
+  2026-05-22  (13 Indian passes)
+    05:42 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:30 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    07:24 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:06 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:29 PKT  TILT  CARTOSAT-2E     ->  TIER-1: —
+
+  2026-05-23  (13 Indian passes)
+    05:40 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:18 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    07:22 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    09:04 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    09:34 PKT  OVER  CARTOSAT-2C     ->  TIER-1: —
+
+  2026-05-24  (12 Indian passes)
+    05:38 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    06:07 PKT  OVER  EOS-4           ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    07:20 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    07:42 PKT  TILT  EOS-4           ->  TIER-1: —
+    09:01 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-25  (14 Indian passes)
+    05:36 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    05:56 PKT  TILT  EOS-4           ->  TIER-1: Lahore + secondary: Gilgit, Gujranwala, Mangla, Skardu
+    07:18 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    07:31 PKT  TILT  EOS-4           ->  TIER-1: —
+    08:59 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+
+  2026-05-26  (14 Indian passes)
+    05:34 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    05:46 PKT  TILT  EOS-4           ->  TIER-1: —
+    07:15 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    07:20 PKT  TILT  EOS-4           ->  TIER-1: — + secondary: Gwadar
+    08:57 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Karachi, Lahore, Quetta, Rawalpindi, Sargodha + secondary: Bahawalpur, Chashma, Gujranwala, Khushab, Mangla
+
+  2026-05-27  (13 Indian passes)
+    05:32 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Rawalpindi, Sargodha + secondary: Abbottabad, Chashma, Gilgit, Gujranwala, Khushab
+    05:38 PKT  TILT  EOS-4           ->  TIER-1: —
+    07:09 PKT  OVER  EOS-4           ->  TIER-1: Quetta + secondary: Gwadar, Ormara, Pasni
+    07:13 PKT  OVER  RISAT-2BR1      ->  TIER-1: Islamabad, Kamra (Attock), Lahore, Quetta, Rawalpindi, Sargodha + secondary: Abbottabad, Bahawalpur, Chashma, Gilgit, Gujranwala
+    08:55 PKT  OVER  RISAT-2BR1      ->  TIER-1: Karachi, Quetta + secondary: Bahawalpur, Chashma, Gwadar, Khushab, Multan
+
+================================================================================
+  Sites covered: 26 (11 Tier-1 + 15 Tier-2)
+  Source: pakistan_strategic_sites.py (public open-source coordinates)
+================================================================================

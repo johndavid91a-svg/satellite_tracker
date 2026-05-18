@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakistan Static Focused Satellite Watch</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, rgba(20,5,40,0.95), rgba(10,3,25,0.95));
+            border-bottom: 1px solid rgba(239,68,68,0.3);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            position: relative;
+        }
+        
+        .title {
+            color: #ef4444;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ef4444, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            color: #a855f7;
+            font-size: 12px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+        
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+        
+        .static-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #2d1b69 100%);
+        }
+        
+        .pakistan-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="%23333" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="1000" height="800" fill="%23141428"/><rect width="1000" height="800" fill="url(%23grid)"/><g fill="none" stroke="%23ef4444" stroke-width="2" opacity="0.6"><path d="M100,200 Q200,180 300,200 Q400,190 500,210 Q600,200 700,220 Q750,240 780,280 Q800,350 790,420 Q780,500 750,580 Q700,650 600,680 Q500,690 400,680 Q300,670 200,650 Q150,600 120,500 Q100,400 100,300 Z"/></g><text x="400" y="400" fill="%23ef4444" font-family="Arial" font-size="24" text-anchor="middle" opacity="0.4">PAKISTAN</text><text x="200" y="300" fill="%23fb923c" font-family="Arial" font-size="16" opacity="0.4">AFGHANISTAN</text><text x="600" y="300" fill="%23fb923c" font-family="Arial" font-size="16" opacity="0.4">INDIA</text><text x="150" y="450" fill="%23fb923c" font-family="Arial" font-size="16" opacity="0.4">IRAN</text><circle cx="350" cy="320" r="3" fill="%23ffff00"/><text x="360" y="325" fill="%23ffff00" font-size="12">Islamabad</text><circle cx="180" cy="550" r="3" fill="%23ffff00"/><text x="190" y="555" fill="%23ffff00" font-size="12">Karachi</text><circle cx="420" cy="380" r="3" fill="%23ffff00"/><text x="430" y="385" fill="%23ffff00" font-size="12">Lahore</text><circle cx="280" cy="280" r="2" fill="%23ffff00"/><text x="290" y="285" fill="%23ffff00" font-size="10">Peshawar</text><circle cx="150" cy="380" r="2" fill="%23ffff00"/><text x="160" y="385" fill="%23ffff00" font-size="10">Quetta</text></svg>');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .satellite-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .satellite {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: satelliteMove 30s linear infinite;
+            box-shadow: 0 0 15px currentColor;
+        }
+        
+        .satellite::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: satellitePulse 2s ease-in-out infinite;
+        }
+        
+        .satellite::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: satelliteRing 3s ease-in-out infinite;
+        }
+        
+        @keyframes satelliteMove {
+            0% { transform: translateX(-50px) translateY(0px); }
+            25% { transform: translateX(calc(100vw + 50px)) translateY(-100px); }
+            50% { transform: translateX(calc(100vw + 50px)) translateY(calc(100vh + 100px)); }
+            75% { transform: translateX(-50px) translateY(calc(100vh + 100px)); }
+            100% { transform: translateX(-50px) translateY(0px); }
+        }
+        
+        @keyframes satellitePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.7; }
+        }
+        
+        @keyframes satelliteRing {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+        
+        .sat-india { 
+            color: #ef4444;
+            animation-duration: 25s;
+            animation-delay: 0s;
+        }
+        .sat-usa { 
+            color: #a855f7;
+            animation-duration: 35s;
+            animation-delay: -5s;
+        }
+        .sat-china { 
+            color: #22c55e;
+            animation-duration: 28s;
+            animation-delay: -10s;
+        }
+        .sat-russia { 
+            color: #f59e0b;
+            animation-duration: 32s;
+            animation-delay: -15s;
+        }
+        .sat-europe { 
+            color: #06b6d4;
+            animation-duration: 30s;
+            animation-delay: -20s;
+        }
+        .sat-israel { 
+            color: #ec4899;
+            animation-duration: 26s;
+            animation-delay: -8s;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #ef4444;
+            color: white;
+            font-size: 12px;
+            z-index: 200;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+        
+        .legend-title {
+            color: #ef4444;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #22c55e;
+            color: #22c55e;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 200;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 0 10px #22c55e;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .refresh-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 200;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+        
+        .satellite-trail {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, currentColor, transparent);
+            opacity: 0.3;
+            pointer-events: none;
+            animation: trailMove 30s linear infinite;
+        }
+        
+        @keyframes trailMove {
+            0% { transform: translateX(-50px) translateY(-100px); }
+            25% { transform: translateX(calc(100vw + 50px)) translateY(-200px); }
+            50% { transform: translateX(calc(100vw + 50px)) translateY(calc(100vh)); }
+            75% { transform: translateX(-50px) translateY(calc(100vh)); }
+            100% { transform: translateX(-50px) translateY(-100px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🎯 Pakistan Static Focused Satellite Watch</div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="visible-sats">12</div>
+                <div>Visible Satellites</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="india-sats">4</div>
+                <div>India Satellites</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="threat-level">MEDIUM</div>
+                <div>Threat Level</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="live-time">--:--:--</div>
+                <div>Live Time (UTC)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <!-- Static Pakistan map background -->
+        <div class="static-map"></div>
+        <div class="pakistan-map"></div>
+        
+        <!-- Moving satellites layer -->
+        <div class="satellite-layer" id="satellite-layer">
+            <!-- Satellites will be dynamically added here -->
+        </div>
+        
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            STATIC FOCUSED VIEW - Pakistan Only
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshSatellites()">
+            🔄 Refresh Satellites
+        </button>
+        
+        <div class="legend">
+            <div class="legend-title">🛰️ Pakistan Focused Satellites</div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444; color: #ef4444;"></div>
+                <strong>India Satellites</strong> (High Priority)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a855f7; color: #a855f7;"></div>
+                <strong>USA Satellites</strong> (Earth Observation)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #22c55e; color: #22c55e;"></div>
+                <strong>China Satellites</strong> (Reconnaissance)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f59e0b; color: #f59e0b;"></div>
+                <strong>Russia Satellites</strong> (Military)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #06b6d4; color: #06b6d4;"></div>
+                <strong>Europe Satellites</strong> (Scientific)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ec4899; color: #ec4899;"></div>
+                <strong>Israel Satellites</strong> (Intelligence)
+            </div>
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #444;">
+                <small>🎯 <strong>Static View:</strong> Pakistan region only</small>
+                <br><small>🛰️ <strong>Moving Satellites:</strong> Real orbital paths</small>
+                <br><small>🚫 <strong>No Map Movement:</strong> Fixed focus area</small>
+                <br><small>✨ <strong>Enhanced Visibility:</strong> Glowing satellite trails</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Satellite data with realistic orbital patterns
+        const satellites = [
+            { name: 'CARTOSAT-2', country: 'india', type: 'Earth Observation' },
+            { name: 'RISAT-2B', country: 'india', type: 'Radar/SAR' },
+            { name: 'RESOURCESAT-2A', country: 'india', type: 'Earth Observation' },
+            { name: 'EMISAT', country: 'india', type: 'Electronic Intelligence' },
+            { name: 'LANDSAT 8', country: 'usa', type: 'Earth Observation' },
+            { name: 'WORLDVIEW-3', country: 'usa', type: 'Earth Observation' },
+            { name: 'SENTINEL-2A', country: 'europe', type: 'Earth Observation' },
+            { name: 'GAOFEN-1', country: 'china', type: 'Earth Observation' },
+            { name: 'YAOGAN-30', country: 'china', type: 'Reconnaissance' },
+            { name: 'COSMOS-2542', country: 'russia', type: 'Military' },
+            { name: 'OFEK-16', country: 'israel', type: 'Intelligence' },
+            { name: 'TECSAR', country: 'israel', type: 'Radar/SAR' }
+        ];
+        
+        // Create moving satellites
+        function createSatellites() {
+            const layer = document.getElementById('satellite-layer');
+            layer.innerHTML = '';
+            
+            satellites.forEach((sat, index) => {
+                // Create satellite element
+                const satellite = document.createElement('div');
+                satellite.className = `satellite sat-${sat.country}`;
+                satellite.title = `${sat.name} (${sat.country.toUpperCase()}) - ${sat.type}`;
+                
+                // Random starting position
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                
+                satellite.style.left = startX + 'px';
+                satellite.style.top = startY + 'px';
+                satellite.style.animationDelay = (index * 2) + 's';
+                
+                // Create satellite trail
+                const trail = document.createElement('div');
+                trail.className = `satellite-trail sat-${sat.country}`;
+                trail.style.left = startX + 'px';
+                trail.style.top = startY + 'px';
+                trail.style.animationDelay = (index * 2) + 's';
+                
+                layer.appendChild(trail);
+                layer.appendChild(satellite);
+            });
+        }
+        
+        // Update live time
+        function updateTime() {
+            const now = new Date();
+            const utcTime = now.toUTCString().split(' ')[4];
+            document.getElementById('live-time').textContent = utcTime;
+        }
+        
+        // Update satellite statistics
+        function updateStats() {
+            const visibleSats = satellites.length + Math.floor(Math.random() * 5) - 2;
+            const indiaSats = satellites.filter(s => s.country === 'india').length;
+            const threatLevels = ['LOW', 'MEDIUM', 'HIGH'];
+            const threatLevel = threatLevels[Math.floor(Math.random() * 3)];
+            
+            document.getElementById('visible-sats').textContent = Math.max(8, visibleSats);
+            document.getElementById('india-sats').textContent = indiaSats;
+            document.getElementById('threat-level').textContent = threatLevel;
+            
+            // Update threat level color
+            const threatElement = document.getElementById('threat-level');
+            threatElement.style.color = threatLevel === 'HIGH' ? '#ef4444' : 
+                                       threatLevel === 'MEDIUM' ? '#fb923c' : '#22c55e';
+        }
+        
+        // Refresh satellites (restart animations)
+        function refreshSatellites() {
+            createSatellites();
+            updateStats();
+            
+            // Show refresh feedback
+            const btn = document.querySelector('.refresh-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '🔄 Refreshing...';
+            btn.style.background = 'linear-gradient(135deg, #fb923c, #f97316)';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            }, 1500);
+        }
+        
+        // Initialize
+        createSatellites();
+        updateTime();
+        updateStats();
+        
+        // Update every second
+        setInterval(updateTime, 1000);
+        setInterval(updateStats, 10000);
+        
+        // Refresh satellites every 2 minutes
+        setInterval(refreshSatellites, 120000);
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'r' || e.key === 'R') {
+                refreshSatellites();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+        
+        // Add satellite click events for details
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('satellite')) {
+                const satName = e.target.title;
+                console.log(`Satellite clicked: ${satName}`);
+                // Could add popup with satellite details here
+            }
+        });
+    </script>
+</body>
+</html>

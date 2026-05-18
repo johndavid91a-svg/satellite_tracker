@@ -1,0 +1,41 @@
+{
+  "snapshot_date_utc": "2026-05-18",
+  "created_at": "2026-05-18T07:17:48Z",
+  "files": [
+    {
+      "name": "satellite_history.json",
+      "size_bytes": 382039
+    },
+    {
+      "name": "anomalies.json",
+      "size_bytes": 20887
+    },
+    {
+      "name": "forecast_15day.json",
+      "size_bytes": 5989348
+    },
+    {
+      "name": "tle_cache_celestrak.json",
+      "size_bytes": 12305
+    },
+    {
+      "name": "forecast_changes.json",
+      "size_bytes": 3939
+    },
+    {
+      "name": "forecast_changes_history.json",
+      "size_bytes": 1575397
+    },
+    {
+      "name": "accuracy_track_record.json",
+      "size_bytes": 7549
+    }
+  ],
+  "dirs": [
+    {
+      "name": "documents",
+      "file_count": 76
+    }
+  ],
+  "skipped": []
+}

@@ -1,0 +1,144 @@
+═══════════════════════════════════════════════════════════════════════════════
+    ✅ PAKISTAN AIRSPACE SURVEILLANCE - 15-DAY COMPREHENSIVE REPORT
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 REPORT PERIOD: April 27, 2026 to May 11, 2026 (15 days)
+📄 DOCUMENT: Pakistan_15Day_Surveillance_Report.docx
+📍 LOCATION: Desktop (C:\Users\User\Desktop\)
+📦 FILE SIZE: 39.4 KB
+⏰ GENERATED: May 12, 2026 at 4:04 PM
+
+═══════════════════════════════════════════════════════════════════════════════
+    📊 KEY STATISTICS
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Total Border Crossings: 555
+✓ Unique Satellites Tracked: 21
+✓ Average Crossings per Day: 37
+✓ Total Anomalies Detected: 26
+✓ High Severity Anomalies: 18
+✓ Medium Severity Anomalies: 8
+
+═══════════════════════════════════════════════════════════════════════════════
+    📑 COMPLETE REPORT CONTENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. EXECUTIVE SUMMARY
+   • Overall statistics and key metrics
+   • Period overview with anomaly counts
+   • High-level surveillance summary
+
+2. DAILY STATISTICS TABLE
+   • Date-by-date breakdown
+   • Crossings per day
+   • Unique satellites per day
+   • Anomalies detected per day
+   • Top country and type for each day
+
+3. COUNTRY-WISE ANALYSIS
+   • Satellite crossings by country of origin
+   • Percentage distribution
+   • Complete ranking of all countries
+
+4. SATELLITE TYPE ANALYSIS
+   • Breakdown by mission type (Weather, Earth Observation, etc.)
+   • Frequency and percentage data
+   • Mission category distribution
+
+5. ⚠️ ANOMALY DETECTION ANALYSIS (NEW!)
+   • Total anomalies detected: 26
+   • Severity breakdown (High/Medium)
+   • Anomaly types:
+     - Long Duration crossings
+     - Increased Frequency patterns
+   • Satellites with most anomalies
+   • Detailed anomaly records with:
+     - Date and time of occurrence
+     - Satellite name and operator
+     - Severity level (🔴 High / 🟡 Medium)
+     - Specific details of each anomaly
+     - Entry/exit times and coordinates
+
+6. OPERATOR ANALYSIS
+   • Top 15 satellite operators
+   • Crossing frequency by operator
+   • Percentage distribution
+
+7. KEY FINDINGS
+   • Most active country
+   • Most common satellite type
+   • Most active operator
+   • Busiest and quietest days
+   • Total anomalies summary
+   • Most common anomaly type
+   • Satellite with most anomalies
+
+8. DETAILED DAILY BREAKDOWN
+   • Complete day-by-day listing
+   • All satellites that crossed each day
+   • Country and type information
+   • Grouped by satellite for clarity
+
+═══════════════════════════════════════════════════════════════════════════════
+    ⚠️ ANOMALY HIGHLIGHTS
+═══════════════════════════════════════════════════════════════════════════════
+
+Most Common Anomaly Types:
+• LONG_DURATION: Satellites staying in airspace longer than normal
+• INCREASED_FREQUENCY: Satellites crossing more often than usual
+
+Satellites with Most Anomalies:
+• ISS (International Space Station)
+• TIANGONG (China Space Station)
+• FENGYUN-3C (China Weather Satellite)
+• FENGYUN-3D (China Weather Satellite)
+• CARTOSAT-2 (India Earth Observation)
+
+Anomaly Severity Distribution:
+• 🔴 HIGH: 18 anomalies (69%)
+• 🟡 MEDIUM: 8 anomalies (31%)
+
+═══════════════════════════════════════════════════════════════════════════════
+    🔍 DATA SOURCES & METHODOLOGY
+═══════════════════════════════════════════════════════════════════════════════
+
+• System: ATLAS - Pakistan Border Satellite Surveillance
+• TLE Data: SatNOGS Database + CelesTrak
+• Tracking Method: SGP4 Orbital Propagation
+• Coverage Area: Pakistan Airspace (60°E-77°E, 23°N-37°N)
+• Update Frequency: Real-time with 2-12 hour TLE refresh
+• Anomaly Detection: Automated pattern analysis
+  - Duration threshold: >50% longer than average
+  - Frequency threshold: >100% increase from baseline
+
+═══════════════════════════════════════════════════════════════════════════════
+    📂 FILE INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+File Name: Pakistan_15Day_Surveillance_Report.docx
+File Size: 39.4 KB (39,435 bytes)
+Format: Microsoft Word Document (.docx)
+Location: C:\Users\User\Desktop\
+Pages: Approximately 15-20 pages
+Tables: 7 comprehensive data tables
+Charts: Statistical breakdowns and rankings
+
+═══════════════════════════════════════════════════════════════════════════════
+    🚀 HOW TO OPEN THE REPORT
+═══════════════════════════════════════════════════════════════════════════════
+
+Option 1: Double-click the file on your Desktop
+Option 2: Run command: start Pakistan_15Day_Surveillance_Report.docx
+Option 3: Open with Microsoft Word or compatible viewer
+
+═══════════════════════════════════════════════════════════════════════════════
+    ✅ REPORT GENERATION COMPLETE
+═══════════════════════════════════════════════════════════════════════════════
+
+The comprehensive 15-day surveillance report with full anomaly detection
+analysis has been successfully generated and saved to your Desktop!
+
+All 555 border crossings, 21 unique satellites, and 26 anomalies have been
+documented with detailed analysis, statistics, and insights.
+
+═══════════════════════════════════════════════════════════════════════════════

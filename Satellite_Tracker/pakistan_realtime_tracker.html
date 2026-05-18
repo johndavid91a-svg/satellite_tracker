@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakistan Real-Time Satellite Tracker</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(20,5,40,0.95), rgba(10,3,25,0.95));
+            border-bottom: 2px solid rgba(239,68,68,0.3);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            position: relative;
+            height: 60px;
+        }
+
+        .title {
+            color: #ef4444;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ef4444, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats {
+            display: flex;
+            gap: 25px;
+            color: #a855f7;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: #1a1a2e;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #0f0f23;
+        }
+
+        .satellite-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ef4444;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .satellite-info h3 {
+            color: #ef4444;
+            margin-bottom: 5px;
+        }
+
+        .satellite-info p {
+            margin: 2px 0;
+            font-size: 12px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #22c55e;
+            z-index: 1000;
+        }
+
+        .status-live {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        /* Custom Leaflet styles for dark theme */
+        .leaflet-container {
+            background: #0f0f23 !important;
+        }
+
+        .leaflet-tile {
+            filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.2);
+        }
+
+        .leaflet-control-zoom {
+            display: none !important;
+        }
+
+        .leaflet-control-attribution {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🛰️ Pakistan Real-Time Satellite Tracker</div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSats">0</div>
+                <div>Total Satellites</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="indiaSats">0</div>
+                <div>India</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="usaSats">0</div>
+                <div>USA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="israelSats">0</div>
+                <div>Israel</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="otherSats">0</div>
+                <div>Others</div>
+            </div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444;"></div>
+                <span>India</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a855f7;"></div>
+                <span>USA</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #eab308;"></div>
+                <span>Israel</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffffff;"></div>
+                <span>Others</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="satellite-info" id="satelliteInfo">
+            <h3 id="satName">Satellite Name</h3>
+            <p><strong>Country:</strong> <span id="satCountry">Unknown</span></p>
+            <p><strong>Altitude:</strong> <span id="satAltitude">0 km</span></p>
+            <p><strong>Speed:</strong> <span id="satSpeed">0 km/h</span></p>
+            <p><strong>NORAD ID:</strong> <span id="satNorad">0</span></p>
+            <p><strong>Type:</strong> <span id="satType">Unknown</span></p>
+        </div>
+        <div class="status-indicator">
+            <span class="status-live">● LIVE</span> - Updating every 3 seconds
+        </div>
+    </div>
+
+    <script>
+        // Pakistan bounding box (STRICT LIMITS)
+        const PAKISTAN_BOUNDS = {
+            north: 38,
+            south: 23,
+            east: 78,
+            west: 60
+        };
+
+        // 250km buffer in degrees (approximately)
+        const BUFFER_DEGREES = 2.25;
+
+        // Country identification mapping
+        const COUNTRY_MAPPING = {
+            // India satellites (ISRO and others)
+            'CARTOSAT': 'India',
+            'RESOURCESAT': 'India',
+            'RISAT': 'India',
+            'OCEANSAT': 'India',
+            'ASTROSAT': 'India',
+            'CHANDRAYAAN': 'India',
+            'MANGALYAAN': 'India',
+            'INSAT': 'India',
+            'GSAT': 'India',
+            'IRNSS': 'India',
+            'NAVIC': 'India',
+            
+            // USA satellites
+            'LANDSAT': 'USA',
+            'GOES': 'USA',
+            'NOAA': 'USA',
+            'AQUA': 'USA',
+            'TERRA': 'USA',
+            'MODIS': 'USA',
+            'WORLDVIEW': 'USA',
+            'QUICKBIRD': 'USA',
+            'IKONOS': 'USA',
+            'GEOEYE': 'USA',
+            'KEYHOLE': 'USA',
+            'LACROSSE': 'USA',
+            'ONYX': 'USA',
+            'MISTY': 'USA',
+            'MENTOR': 'USA',
+            'TRUMPET': 'USA',
+            'SBIRS': 'USA',
+            'DSP': 'USA',
+            'MILSTAR': 'USA',
+            'AEHF': 'USA',
+            'WGS': 'USA',
+            'GPS': 'USA',
+            'NAVSTAR': 'USA',
+            
+            // Israel satellites
+            'OFEK': 'Israel',
+            'EROS': 'Israel',
+            'TECHSAR': 'Israel',
+            'VENUS': 'Israel',
+            'AMOS': 'Israel'
+        };
+
+        // Satellite type identification
+        const SATELLITE_TYPES = {
+            'CARTOSAT': 'Imagery',
+            'RESOURCESAT': 'Earth Observation',
+            'RISAT': 'Radar Imaging',
+            'LANDSAT': 'Earth Observation',
+            'WORLDVIEW': 'High-Resolution Imagery',
+            'QUICKBIRD': 'Commercial Imagery',
+            'GEOEYE': 'Commercial Imagery',
+            'KEYHOLE': 'Reconnaissance',
+            'LACROSSE': 'Radar Reconnaissance',
+            'OFEK': 'Reconnaissance',
+            'EROS': 'Commercial Imagery',
+            'TECHSAR': 'Radar Imaging'
+        };
+
+        // Color mapping for countries
+        const COUNTRY_COLORS = {
+            'India': '#ef4444',    // RED
+            'USA': '#a855f7',      // PURPLE
+            'Israel': '#eab308',   // YELLOW
+            'default': '#ffffff'   // WHITE
+        };
+
+        let map;
+        let satellites = [];
+        let satelliteMarkers = {};
+        let updateInterval;
+
+        // Initialize map
+        function initMap() {
+            // Create map with Pakistan center
+            const pakistanCenter = [30.5, 69.25]; // Center of Pakistan
+            
+            map = L.map('map', {
+                center: pakistanCenter,
+                zoom: 6,
+                minZoom: 6,
+                maxZoom: 8,
+                zoomControl: false,
+                dragging: false,
+                touchZoom: false,
+                doubleClickZoom: false,
+                scrollWheelZoom: false,
+                boxZoom: false,
+                keyboard: false,
+                tap: false
+            });
+
+            // Add dark tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '',
+                maxZoom: 8,
+                minZoom: 6
+            }).addTo(map);
+
+            // Set strict bounds to Pakistan region
+            const bounds = L.latLngBounds(
+                [PAKISTAN_BOUNDS.south, PAKISTAN_BOUNDS.west],
+                [PAKISTAN_BOUNDS.north, PAKISTAN_BOUNDS.east]
+            );
+            map.setMaxBounds(bounds);
+            map.fitBounds(bounds);
+
+            // Add Pakistan border outline
+            addPakistanBorder();
+        }
+
+        // Add Pakistan border visualization
+        function addPakistanBorder() {
+            const pakistanBorder = [
+                [37.084, 75.158], [36.738, 74.844], [36.458, 74.388],
+                [36.011, 73.985], [35.467, 74.388], [34.992, 74.844],
+                [34.517, 74.388], [34.042, 73.985], [33.567, 73.582],
+                [33.092, 73.179], [32.617, 72.776], [32.142, 72.373],
+                [31.667, 71.970], [31.192, 71.567], [30.717, 71.164],
+                [30.242, 70.761], [29.767, 70.358], [29.292, 69.955],
+                [28.817, 69.552], [28.342, 69.149], [27.867, 68.746],
+                [27.392, 68.343], [26.917, 67.940], [26.442, 67.537],
+                [25.967, 67.134], [25.492, 66.731], [25.017, 66.328],
+                [24.542, 65.925], [24.067, 65.522], [23.592, 65.119],
+                [23.117, 64.716], [23.642, 64.313], [24.167, 63.910],
+                [24.692, 63.507], [25.217, 63.104], [25.742, 62.701],
+                [26.267, 62.298], [26.792, 61.895], [27.317, 61.492],
+                [27.842, 61.089], [28.367, 60.686], [28.892, 61.089],
+                [29.417, 61.492], [29.942, 61.895], [30.467, 62.298],
+                [30.992, 62.701], [31.517, 63.104], [32.042, 63.507],
+                [32.567, 63.910], [33.092, 64.313], [33.617, 64.716],
+                [34.142, 65.119], [34.667, 65.522], [35.192, 65.925],
+                [35.717, 66.328], [36.242, 66.731], [36.767, 67.134],
+                [37.292, 67.537], [37.817, 67.940], [37.342, 68.343],
+                [36.867, 68.746], [36.392, 69.149], [35.917, 69.552],
+                [35.442, 69.955], [34.967, 70.358], [34.492, 70.761],
+                [34.017, 71.164], [33.542, 71.567], [33.067, 71.970],
+                [32.592, 72.373], [32.117, 72.776], [31.642, 73.179],
+                [31.167, 73.582], [30.692, 73.985], [30.217, 74.388],
+                [29.742, 74.791], [29.267, 75.194], [28.792, 75.597],
+                [28.317, 76.000], [27.842, 76.403], [27.367, 76.806],
+                [26.892, 77.209], [26.417, 77.612], [25.942, 78.015],
+                [37.084, 75.158]
+            ];
+
+            L.polygon(pakistanBorder, {
+                color: '#ef4444',
+                weight: 2,
+                opacity: 0.8,
+                fillOpacity: 0.1,
+                fillColor: '#ef4444'
+            }).addTo(map);
+        }
+
+        // Identify satellite country based on name
+        function identifySatelliteCountry(name) {
+            const upperName = name.toUpperCase();
+            
+            for (const [keyword, country] of Object.entries(COUNTRY_MAPPING)) {
+                if (upperName.includes(keyword)) {
+                    return country;
+                }
+            }
+            
+            // Additional heuristics
+            if (upperName.includes('PSLV') || upperName.includes('ISRO')) return 'India';
+            if (upperName.includes('FALCON') || upperName.includes('DRAGON')) return 'USA';
+            if (upperName.includes('SHAVIT')) return 'Israel';
+            
+            return 'Unknown';
+        }
+
+        // Identify satellite type
+        function identifySatelliteType(name) {
+            const upperName = name.toUpperCase();
+            
+            for (const [keyword, type] of Object.entries(SATELLITE_TYPES)) {
+                if (upperName.includes(keyword)) {
+                    return type;
+                }
+            }
+            
+            if (upperName.includes('RECON') || upperName.includes('SPY')) return 'Reconnaissance';
+            if (upperName.includes('COMM') || upperName.includes('COMMUNICATION')) return 'Communication';
+            if (upperName.includes('WEATHER') || upperName.includes('METEO')) return 'Weather';
+            if (upperName.includes('GPS') || upperName.includes('NAVIGATION')) return 'Navigation';
+            
+            return 'Unknown';
+        }
+
+        // Check if satellite is within Pakistan region (including buffer)
+        function isInPakistanRegion(lat, lon) {
+            return lat >= (PAKISTAN_BOUNDS.south - BUFFER_DEGREES) &&
+                   lat <= (PAKISTAN_BOUNDS.north + BUFFER_DEGREES) &&
+                   lon >= (PAKISTAN_BOUNDS.west - BUFFER_DEGREES) &&
+                   lon <= (PAKISTAN_BOUNDS.east + BUFFER_DEGREES);
+        }
+
+        // Create satellite marker
+        function createSatelliteMarker(satellite) {
+            const country = identifySatelliteCountry(satellite.name);
+            const color = COUNTRY_COLORS[country] || COUNTRY_COLORS.default;
+            
+            const icon = L.divIcon({
+                className: 'satellite-marker',
+                html: `<div style="
+                    width: 16px;
+                    height: 16px;
+                    background: ${color};
+                    border: 2px solid #ffffff;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px ${color};
+                    animation: pulse 2s infinite;
+                "></div>
+                <style>
+                    @keyframes pulse {
+                        0% { box-shadow: 0 0 5px ${color}; }
+                        50% { box-shadow: 0 0 15px ${color}, 0 0 25px ${color}; }
+                        100% { box-shadow: 0 0 5px ${color}; }
+                    }
+                </style>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            const marker = L.marker([satellite.lat, satellite.lon], { icon }).addTo(map);
+            
+            // Add click event for satellite info
+            marker.on('click', () => showSatelliteInfo(satellite));
+            
+            return marker;
+        }
+
+        // Show satellite information
+        function showSatelliteInfo(satellite) {
+            const country = identifySatelliteCountry(satellite.name);
+            const type = identifySatelliteType(satellite.name);
+            
+            document.getElementById('satName').textContent = satellite.name;
+            document.getElementById('satCountry').textContent = country;
+            document.getElementById('satAltitude').textContent = `${satellite.altitude.toFixed(0)} km`;
+            document.getElementById('satSpeed').textContent = `${satellite.velocity.toFixed(0)} km/h`;
+            document.getElementById('satNorad').textContent = satellite.noradId;
+            document.getElementById('satType').textContent = type;
+            
+            document.getElementById('satelliteInfo').style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                document.getElementById('satelliteInfo').style.display = 'none';
+            }, 5000);
+        }
+
+        // Update satellite statistics
+        function updateStats() {
+            const stats = {
+                total: 0,
+                india: 0,
+                usa: 0,
+                israel: 0,
+                others: 0
+            };
+
+            satellites.forEach(sat => {
+                const country = identifySatelliteCountry(sat.name);
+                stats.total++;
+                
+                switch(country) {
+                    case 'India': stats.india++; break;
+                    case 'USA': stats.usa++; break;
+                    case 'Israel': stats.israel++; break;
+                    default: stats.others++; break;
+                }
+            });
+
+            document.getElementById('totalSats').textContent = stats.total;
+            document.getElementById('indiaSats').textContent = stats.india;
+            document.getElementById('usaSats').textContent = stats.usa;
+            document.getElementById('israelSats').textContent = stats.israel;
+            document.getElementById('otherSats').textContent = stats.others;
+        }
+
+        // Simulate real-time satellite data (replace with actual TLE/API data)
+        function generateMockSatellites() {
+            const mockSatellites = [
+                // India satellites
+                { name: 'CARTOSAT-2E', noradId: 41948, country: 'India' },
+                { name: 'RESOURCESAT-2A', noradId: 42037, country: 'India' },
+                { name: 'RISAT-2B', noradId: 44227, country: 'India' },
+                { name: 'GSAT-30', noradId: 45269, country: 'India' },
+                
+                // USA satellites
+                { name: 'LANDSAT-8', noradId: 39084, country: 'USA' },
+                { name: 'WORLDVIEW-3', noradId: 40115, country: 'USA' },
+                { name: 'KEYHOLE-12', noradId: 25744, country: 'USA' },
+                { name: 'GPS BIIR-2', noradId: 26360, country: 'USA' },
+                
+                // Israel satellites
+                { name: 'OFEK-16', noradId: 46123, country: 'Israel' },
+                { name: 'EROS-B', noradId: 31601, country: 'Israel' },
+                
+                // Others
+                { name: 'SPOT-7', noradId: 40053, country: 'France' },
+                { name: 'SENTINEL-2A', noradId: 40697, country: 'ESA' }
+            ];
+
+            satellites = mockSatellites.map(sat => ({
+                ...sat,
+                lat: PAKISTAN_BOUNDS.south + Math.random() * (PAKISTAN_BOUNDS.north - PAKISTAN_BOUNDS.south),
+                lon: PAKISTAN_BOUNDS.west + Math.random() * (PAKISTAN_BOUNDS.east - PAKISTAN_BOUNDS.west),
+                altitude: 400 + Math.random() * 800, // 400-1200 km
+                velocity: 25000 + Math.random() * 5000, // 25000-30000 km/h
+                direction: Math.random() * 360 // degrees
+            }));
+        }
+
+        // Update satellite positions (simulate orbital movement)
+        function updateSatellitePositions() {
+            satellites.forEach(sat => {
+                // Simulate orbital movement
+                const speed = 0.001; // degrees per update
+                sat.lat += Math.sin(sat.direction * Math.PI / 180) * speed;
+                sat.lon += Math.cos(sat.direction * Math.PI / 180) * speed;
+                
+                // Keep within extended bounds
+                if (sat.lat < PAKISTAN_BOUNDS.south - BUFFER_DEGREES || 
+                    sat.lat > PAKISTAN_BOUNDS.north + BUFFER_DEGREES ||
+                    sat.lon < PAKISTAN_BOUNDS.west - BUFFER_DEGREES || 
+                    sat.lon > PAKISTAN_BOUNDS.east + BUFFER_DEGREES) {
+                    // Reset to opposite side (simulate orbital pass)
+                    sat.lat = PAKISTAN_BOUNDS.south + Math.random() * (PAKISTAN_BOUNDS.north - PAKISTAN_BOUNDS.south);
+                    sat.lon = PAKISTAN_BOUNDS.west + Math.random() * (PAKISTAN_BOUNDS.east - PAKISTAN_BOUNDS.west);
+                }
+                
+                // Update marker position
+                if (satelliteMarkers[sat.noradId]) {
+                    satelliteMarkers[sat.noradId].setLatLng([sat.lat, sat.lon]);
+                }
+            });
+        }
+
+        // Render satellites on map
+        function renderSatellites() {
+            // Clear existing markers
+            Object.values(satelliteMarkers).forEach(marker => map.removeLayer(marker));
+            satelliteMarkers = {};
+
+            // Filter satellites in Pakistan region
+            const visibleSatellites = satellites.filter(sat => isInPakistanRegion(sat.lat, sat.lon));
+
+            // Create markers for visible satellites
+            visibleSatellites.forEach(sat => {
+                satelliteMarkers[sat.noradId] = createSatelliteMarker(sat);
+            });
+
+            // Update satellites array to only include visible ones
+            satellites = visibleSatellites;
+            updateStats();
+        }
+
+        // Start real-time updates
+        function startRealTimeUpdates() {
+            updateInterval = setInterval(() => {
+                updateSatellitePositions();
+                updateStats();
+            }, 3000); // Update every 3 seconds
+        }
+
+        // Initialize the application
+        function init() {
+            initMap();
+            generateMockSatellites();
+            renderSatellites();
+            startRealTimeUpdates();
+            
+            console.log('Pakistan Real-Time Satellite Tracker initialized');
+            console.log(`Tracking ${satellites.length} satellites in Pakistan region`);
+        }
+
+        // Start when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
